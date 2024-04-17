@@ -1,4 +1,4 @@
-name: Get Changed Integrations
+name: Get Changed Integrations (testing)
 
 on:
   push:
