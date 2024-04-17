@@ -24,7 +24,7 @@ dependencies = ["prefect"]
 dynamic = ["version"]
 
 [project.optional-dependencies]
-dev = ["ruff", "uv", "pre-commit"]
+dev = ["ruff", "uv", "pre-commit", "commitizen"]
 
 [project.urls]
 "Homepage" = "https://github.com/zzstoatzz/integration-monorepo"
