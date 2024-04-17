@@ -26,4 +26,4 @@ jobs:
           current_commit=$(git rev-parse HEAD)
           echo "PREVIOUS_TAG=$previous_tag" >> $GITHUB_ENV
           echo "CURRENT_COMMIT=$current_commit" >> $GITHUB_ENV
-          python get_changed_integrations.py
+          python scripts/get_changed_integrations.py
