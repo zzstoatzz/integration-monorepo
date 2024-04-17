@@ -25,7 +25,11 @@ jobs:
         run: echo "tags=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
       - name: Get changed integrations
+        id: get-changed-integrations
         env:
           PREVIOUS_TAG: ${{ steps.describe-tags.outputs.tags }}
           CURRENT_COMMIT: ${{ github.sha }}
-        run: python scripts/get_changed_integrations.py
+        run: echo "changed_integrations=$(python scripts/get_changed_integrations.py)" >> $GITHUB_OUTPUT
+
+      - name: Print changed integrations
+        run: echo "${{ steps.get-changed-integrations.outputs.changed_integrations }}"
