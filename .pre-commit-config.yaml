@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: "v0.2.1"
+    rev: "v0.3.7"
     hooks:
       - id: ruff
         language_version: python3
@@ -8,9 +8,9 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.22.0 # automatically updated by Commitizen
+  # pre-commit install --hook-type commit-msg --hook-type pre-push
+    rev: v3.22.0
     hooks:
       - id: commitizen
-        stages: [commit-msg]
-        additional_dependencies: [commitizen]
-        args: [--hook-stage=prepare-commit-msg]
+      - id: commitizen-branch
+        stages: [push]
