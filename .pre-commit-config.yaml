@@ -8,9 +8,9 @@ repos:
       - id: ruff-format
 
   - repo: https://github.com/commitizen-tools/commitizen
-  # pre-commit install --hook-type commit-msg --hook-type pre-push
     rev: v3.22.0
     hooks:
       - id: commitizen
+        stages: [commit-msg]
       - id: commitizen-branch
-        stages: [push]
+        stages: [pre-push]
