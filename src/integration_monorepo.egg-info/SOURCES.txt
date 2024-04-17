@@ -1,8 +1,0 @@
-pyproject.toml
-src/integration_monorepo/__init__.py
-src/integration_monorepo/_version.py
-src/integration_monorepo.egg-info/PKG-INFO
-src/integration_monorepo.egg-info/SOURCES.txt
-src/integration_monorepo.egg-info/dependency_links.txt
-src/integration_monorepo.egg-info/requires.txt
-src/integration_monorepo.egg-info/top_level.txt
