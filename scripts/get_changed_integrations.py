@@ -1,6 +1,9 @@
 import os
 import subprocess
+import sys
 from pathlib import Path
+
+INTEGRATIONS_PATH = "integrations"
 
 
 def get_changed_files(previous_tag: str, current_commit: str) -> list[str]:
@@ -9,20 +12,19 @@ def get_changed_files(previous_tag: str, current_commit: str) -> list[str]:
     return output.strip().split("\n")
 
 
-def get_changed_integrations(changed_files: list[str]) -> list[str]:
-    changed_integrations: set[str] = set()
+def get_changed_integrations(changed_files: list[str], glob_pattern: str) -> list[str]:
+    integrations_base_path = Path(INTEGRATIONS_PATH)
+    changed_integrations = set()
+
     for file_path in changed_files:
         path = Path(file_path)
-        if (
-            len(path.parts) >= 2
-            and path.parts[0] == "integrations"
-            and path.suffix == ".py"
-        ):
-            changed_integrations.add(path.parts[1])
+        if path.match(glob_pattern) and integrations_base_path in path.parents:
+            changed_integrations.add(path.parent.name)
+
     return sorted(changed_integrations)
 
 
-def main() -> None:
+def main(glob_pattern: str = f"{INTEGRATIONS_PATH}/**/*.py"):
     previous_tag = os.environ.get("PREVIOUS_TAG", "")
     current_commit = os.environ.get("CURRENT_COMMIT", "")
 
@@ -34,7 +36,7 @@ def main() -> None:
         return
 
     changed_files = get_changed_files(previous_tag, current_commit)
-    changed_integrations = get_changed_integrations(changed_files)
+    changed_integrations = get_changed_integrations(changed_files, glob_pattern)
 
     if changed_integrations:
         print("Changed integrations:")
@@ -45,4 +47,7 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        main(sys.argv[1])
+    else:
+        main()
