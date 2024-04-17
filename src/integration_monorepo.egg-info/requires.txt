@@ -1,0 +1,6 @@
+prefect
+
+[dev]
+ruff
+uv
+pre-commit

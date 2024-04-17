@@ -1,0 +1,55 @@
+name: Get Changed Integrations
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  get-changed-integrations:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: git fetch --tags
+
+      - name: Get previous release tag
+        run: |
+          previous_tag=$(git describe --tags --abbrev=0 HEAD^)
+          echo "previous_tag=$previous_tag" >> $GITHUB_ENV
+
+      - name: Get changed files
+        run: |
+          changed_files=$(git diff --name-only ${{ env.previous_tag }}..HEAD)
+          echo "changed_files=$changed_files" >> $GITHUB_ENV
+
+      - name: Get changed integrations
+        run: |
+          changed_integrations=$(echo "${{ env.changed_files }}" | grep -oP 'integrations/\K[^/]+' | uniq)
+          echo "changed_integrations=$changed_integrations" >> $GITHUB_ENV
+
+      - name: Check changed Python files in integrations
+        run: |
+          for integration in ${{ env.changed_integrations }}; do
+            changed_python_files=$(echo "${{ env.changed_files }}" | grep -E "integrations/$integration/.*\.py$")
+            if [ -n "$changed_python_files" ]; then
+              echo "Changed Python files in integration $integration:"
+              echo "$changed_python_files"
+              echo "::set-output name=changed_integrations::$integration"
+            fi
+          done
+        id: changed_python_files
+
+      - name: Print changed integrations
+        run: |
+          if [ -n "${{ steps.changed_python_files.outputs.changed_integrations }}" ]; then
+            echo "Changed integrations:"
+            echo "${{ steps.changed_python_files.outputs.changed_integrations }}"
+          else
+            echo "No changed integrations found."
+          fi
