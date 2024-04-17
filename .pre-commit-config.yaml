@@ -6,8 +6,12 @@ repos:
         language_version: python3
         args: [--fix, --exit-non-zero-on-fix, --show-fixes]
       - id: ruff-format
+
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v2.20.0
+    rev: v3.22.0 # automatically updated by Commitizen
     hooks:
       - id: commitizen
-        stages: [commit-msg]
+      - id: commitizen-branch
+        stages:
+          - post-commit
+          - push
