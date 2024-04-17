@@ -3,7 +3,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-INTEGRATIONS_PATH = "integrations"
+INTEGRATIONS_PATH = "src/integrations"
 
 
 def get_changed_files(previous_tag: str, current_commit: str) -> list[str]:
