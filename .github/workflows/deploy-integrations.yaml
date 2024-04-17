@@ -16,14 +16,16 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
+      - name: Describe tags
+        id: describe-tags
+        run: git describe --tags --abbrev=0
+
       - name: Get changed integrations
-        run: |
-          previous_tag=$(git describe --tags --abbrev=0 HEAD^)
-          current_commit=$(git rev-parse HEAD)
-          echo "PREVIOUS_TAG=$previous_tag" >> $GITHUB_ENV
-          echo "CURRENT_COMMIT=$current_commit" >> $GITHUB_ENV
-          python scripts/get_changed_integrations.py
+        env:
+          PREVIOUS_TAG: ${{ steps.describe-tags.outputs.stdout }}
+          CURRENT_COMMIT: ${{ github.sha }}
+        run: python scripts/get_changed_integrations.py
