@@ -24,12 +24,11 @@ def get_changed_integrations(changed_files: list[str], glob_pattern: str) -> lis
     return sorted(changed_integrations)
 
 
-def main(glob_pattern: str = f"{INTEGRATIONS_PATH}/**/*.py"):
+def main(glob_pattern: str = "**.py"):
     previous_tag = os.environ.get("PREVIOUS_TAG", "")
     current_commit = os.environ.get("CURRENT_COMMIT", "")
 
     if not previous_tag or not current_commit:
-        print(os.environ)
         print(
             "Error: `PREVIOUS_TAG` or `CURRENT_COMMIT` environment variable is missing."
         )
@@ -39,7 +38,6 @@ def main(glob_pattern: str = f"{INTEGRATIONS_PATH}/**/*.py"):
     changed_integrations = get_changed_integrations(changed_files, glob_pattern)
 
     if changed_integrations:
-        print("Changed integrations:")
         for integration in changed_integrations:
             print(integration)
     else:
