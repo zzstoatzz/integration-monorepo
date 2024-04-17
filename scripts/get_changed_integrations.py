@@ -27,6 +27,7 @@ def main() -> None:
     current_commit = os.environ.get("CURRENT_COMMIT", "")
 
     if not previous_tag or not current_commit:
+        print(os.environ)
         print(
             "Error: `PREVIOUS_TAG` or `CURRENT_COMMIT` environment variable is missing."
         )
