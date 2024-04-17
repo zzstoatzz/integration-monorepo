@@ -22,7 +22,7 @@ jobs:
 
       - name: Describe tags
         id: describe-tags
-        run: git describe --tags --abbrev=0
+        run: echo $(git describe --tags --abbrev=0)
 
       - name: Get changed integrations
         env:
