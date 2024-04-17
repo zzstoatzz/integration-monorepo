@@ -31,5 +31,11 @@ jobs:
           CURRENT_COMMIT: ${{ github.sha }}
         run: echo "changed_integrations=$(python scripts/get_changed_integrations.py)" >> $GITHUB_OUTPUT
 
-      - name: Print changed integrations
-        run: echo "${{ steps.get-changed-integrations.outputs.changed_integrations }}"
+      - name: Print the comma delimited integrations one at a time
+        env:
+          CHANGED_INTEGRATIONS: ${{ steps.get-changed-integrations.outputs.changed_integrations }}
+        run: |
+          for integration in $(echo $CHANGED_INTEGRATIONS | tr "," "\n")
+          do
+            echo $integration
+          done

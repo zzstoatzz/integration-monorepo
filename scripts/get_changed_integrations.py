@@ -38,8 +38,7 @@ def main(glob_pattern: str = "**.py"):
     changed_integrations = get_changed_integrations(changed_files, glob_pattern)
 
     if changed_integrations:
-        for integration in changed_integrations:
-            print(integration)
+        print(",".join(changed_integrations))
     else:
         print("No changed integrations found.")
 
