@@ -1,9 +1,11 @@
+import json
 import os
 import subprocess
 import sys
 from pathlib import Path
 
 import toml
+from packaging.version import Version
 
 INTEGRATIONS_BASEPATH = "src/integrations"
 INTEGRATIONS_VERSIONS_FILE = "src/integrations/versions.toml"
@@ -15,10 +17,9 @@ def get_changed_files(previous_tag: str, current_commit: str) -> list[str]:
     return output.strip().split("\n")
 
 
-def get_next_version(integration_name: str, current_version: str) -> str:
-    cmd = f"cz bump --dry-run --increment-by 1 --file-name {INTEGRATIONS_VERSIONS_FILE} --key integrations.{integration_name}"
-    output = subprocess.check_output(cmd, shell=True, text=True)
-    return output.strip().split(" ")[-1]
+def increment_patch_version(version: str) -> str:
+    v = Version(version)
+    return f"{v.major}.{v.minor}.{v.micro + 1}"
 
 
 def get_changed_integrations(
@@ -41,14 +42,14 @@ def get_changed_integrations(
         path = Path(file_path)
         integration_name = path.parent.name
         if integration_name in versions:
-            changed_integrations[integration_name] = get_next_version(
-                integration_name, versions[integration_name]
-            )
+            current_version = versions[integration_name]
+            next_version = increment_patch_version(current_version)
+            changed_integrations[integration_name] = next_version
 
     return changed_integrations
 
 
-def main(glob_pattern: str = "**.py"):
+def main(glob_pattern: str = "**/*.py"):
     previous_tag = os.environ.get("PREVIOUS_TAG", "")
     current_commit = os.environ.get("CURRENT_COMMIT", "")
 
@@ -61,10 +62,7 @@ def main(glob_pattern: str = "**.py"):
     changed_files = get_changed_files(previous_tag, current_commit)
     changed_integrations = get_changed_integrations(changed_files, glob_pattern)
 
-    if changed_integrations:
-        print(",".join(changed_integrations))
-    else:
-        print("No changed integrations found.")
+    print(json.dumps(changed_integrations))
 
 
 if __name__ == "__main__":
