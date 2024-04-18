@@ -2,9 +2,9 @@ import json
 import os
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
-import toml
 from packaging.version import Version
 
 INTEGRATIONS_BASEPATH = "src/integrations"
@@ -27,9 +27,8 @@ def get_changed_integrations(
 ) -> dict[str, str]:
     integrations_base_path = Path(INTEGRATIONS_BASEPATH)
     changed_integrations = {}
-    versions: dict[str, str] = toml.load(Path(INTEGRATIONS_VERSIONS_FILE)).get(
-        "integrations", {}
-    )
+    with open(INTEGRATIONS_VERSIONS_FILE, "rb") as f:
+        versions: dict[str, str] = tomllib.load(f).get("integrations", {})
 
     modified_integrations_files = [
         file_path
