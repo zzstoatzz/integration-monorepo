@@ -1,4 +1,4 @@
-name: Get Changed Integrations
+name: Create tags for changed integrations
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  get-changed-integrations:
+  create-integrations-tags:
     runs-on: ubuntu-latest
 
     steps:
@@ -35,11 +35,13 @@ jobs:
           CURRENT_COMMIT: ${{ github.sha }}
         run: echo "changed_integrations=$(python scripts/get_changed_integrations.py)" >> $GITHUB_OUTPUT
 
-      - name: Print the comma delimited integrations one at a time
+      - name: Create tags
         env:
           CHANGED_INTEGRATIONS: ${{ steps.get-changed-integrations.outputs.changed_integrations }}
         run: |
-          for integration in $(echo $CHANGED_INTEGRATIONS | tr "," "\n")
-          do
-            echo $integration
+          for integration in $(echo $CHANGED_INTEGRATIONS | tr ',' '\n'); do
+            IFS='=' read -r name version <<< "$integration"
+            tag_name="${name}_v${version}"
+            git tag $tag_name
+            git push origin $tag_name
           done
