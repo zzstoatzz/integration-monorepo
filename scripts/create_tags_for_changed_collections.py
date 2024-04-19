@@ -29,14 +29,12 @@ def get_changed_integrations(
     changed_integrations = {}
     with open(INTEGRATIONS_VERSIONS_FILE, "rb") as f:
         versions: dict[str, str] = tomllib.load(f).get("integrations", {})
-
     modified_integrations_files = [
         file_path
         for file_path in changed_files
         if Path(file_path).match(glob_pattern)
         and integrations_base_path in Path(file_path).parents
     ]
-
     for file_path in modified_integrations_files:
         path = Path(file_path)
         integration_name = path.parent.name
@@ -44,8 +42,17 @@ def get_changed_integrations(
             current_version = versions[integration_name]
             next_version = increment_patch_version(current_version)
             changed_integrations[integration_name] = next_version
-
     return changed_integrations
+
+
+def create_tags(changed_integrations: dict[str, str]) -> None:
+    for integration_name, version in changed_integrations.items():
+        tag_name = f"{integration_name}_v{version}"
+        cmd = (
+            f"gh api repos/{os.environ['GITHUB_REPOSITORY']}/git/refs"
+            f"-X POST -F ref=refs/tags/{tag_name} -F sha={os.environ['CURRENT_COMMIT']}"
+        )
+        subprocess.run(cmd, shell=True, check=True)
 
 
 def main(glob_pattern: str = "**/*.py"):
@@ -60,8 +67,10 @@ def main(glob_pattern: str = "**/*.py"):
 
     changed_files = get_changed_files(previous_tag, current_commit)
     changed_integrations = get_changed_integrations(changed_files, glob_pattern)
-
     print(json.dumps(changed_integrations))
+
+    if changed_integrations:
+        create_tags(changed_integrations)
 
 
 if __name__ == "__main__":

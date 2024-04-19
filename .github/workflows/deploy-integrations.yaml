@@ -28,19 +28,8 @@ jobs:
         id: describe-tags
         run: echo "tags=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
-      - name: Get changed integrations
-        id: get-changed-integrations
+      - name: Push tags for changed integrations
         env:
           PREVIOUS_TAG: ${{ steps.describe-tags.outputs.tags }}
           CURRENT_COMMIT: ${{ github.sha }}
-        run: echo "changed_integrations=$(python scripts/get_changed_integrations.py)" >> $GITHUB_OUTPUT
-
-      - name: Create tags
-        env:
-          CHANGED_INTEGRATIONS: ${{ steps.get-changed-integrations.outputs.changed_integrations }}
-        run: |
-          echo $CHANGED_INTEGRATIONS | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while IFS='=' read -r name version; do
-            tag_name="${name}_v${version}"
-            git tag $tag_name
-            git push origin $tag_name
-          done
+        run: python scripts/create_tags_for_changed_collections.py
