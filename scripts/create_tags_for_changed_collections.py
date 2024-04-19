@@ -38,9 +38,9 @@ async def get_changed_integrations(
     for file_path in modified_integrations_files:
         path = Path(file_path)
         integration_name = path.parent.name
-        ref = await fetch_latest_repo_tag(OWNER, REPO, f"{integration_name}-*")
+        latest_ref = await fetch_latest_repo_tag(OWNER, REPO, f"{integration_name}-*")
         changed_integrations[integration_name] = increment_patch_version(
-            ref.object.tag.replace("refs/tags/", "")
+            latest_ref.ref.replace("refs/tags/", "")
         )
     return changed_integrations
 
