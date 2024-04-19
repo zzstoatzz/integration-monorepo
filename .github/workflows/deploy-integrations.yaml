@@ -30,7 +30,7 @@ jobs:
 
       - name: Push tags for changed integrations
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN }}
           PREVIOUS_TAG: ${{ steps.describe-tags.outputs.tags }}
           CURRENT_COMMIT: ${{ github.sha }}
           GITHUB_ACTOR: ${{ github.actor }}
