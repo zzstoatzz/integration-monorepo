@@ -45,12 +45,10 @@ def get_changed_integrations(
     return changed_integrations
 
 
-def create_tags(changed_integrations: dict[str, str], current_commit: str):
+def create_tags(changed_integrations: dict[str, str]) -> None:
     for integration_name, version in changed_integrations.items():
-        cmd = (
-            f"gh api repos/zzstoatzz/integrations-monorepo/git/refs"
-            f"-X POST -F ref=refs/tags/{integration_name}-{version} -F sha={current_commit}"
-        )
+        tag_name = f"{integration_name}_v{version}"
+        cmd = f"git tag {tag_name} && git push origin {tag_name}"
         subprocess.run(cmd, shell=True, check=True)
 
 
@@ -69,7 +67,7 @@ def main(glob_pattern: str = "**/*.py"):
     print(json.dumps(changed_integrations))
 
     if changed_integrations:
-        create_tags(changed_integrations, current_commit)
+        create_tags(changed_integrations)
 
 
 if __name__ == "__main__":
