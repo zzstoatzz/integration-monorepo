@@ -1,9 +1,9 @@
 name: Create tags for changed integrations
 
 on:
-  push:
-    branches:
-      - main
+  release:
+    types: [published]
+  workflow_dispatch:
 
 jobs:
   create-integrations-tags:
@@ -25,13 +25,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -U packaging gh-util
 
-      - name: Describe tags
-        id: describe-tags
-        run: echo "tags=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
+      - name: Get previous tag
+        id: get-previous-tag
+        run: echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
       - name: Push tags for changed integrations
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          PREVIOUS_TAG: ${{ steps.describe-tags.outputs.tags }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PREVIOUS_TAG: ${{ steps.get-previous-tag.outputs.tag }}
           CURRENT_COMMIT: ${{ github.sha }}
+
         run: python scripts/create_tags_for_changed_collections.py
