@@ -22,9 +22,8 @@ jobs:
       
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade uv
-          uv venv
-          uv pip install packaging gh-util
+          python -m pip install --upgrade pip
+          pip install -U packaging gh-util
 
       - name: Describe tags
         id: describe-tags
