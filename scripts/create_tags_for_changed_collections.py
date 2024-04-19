@@ -48,7 +48,12 @@ def get_changed_integrations(
 def create_tags(changed_integrations: dict[str, str]) -> None:
     for integration_name, version in changed_integrations.items():
         tag_name = f"{integration_name}-{version}"
-        cmd = f"git tag {tag_name} && git push origin {tag_name}"
+        cmd = (
+            f'git config --global user.email "{os.environ["GITHUB_ACTOR"]}@users.noreply.github.com" '
+            f'&& git config --global user.name "{os.environ["GITHUB_ACTOR"]}" '
+            f'&& git tag -a {tag_name} -m "release tag {integration_name} {version}"'
+            f'&& git push origin {tag_name}'
+        )
         subprocess.run(cmd, shell=True, check=True)
 
 
