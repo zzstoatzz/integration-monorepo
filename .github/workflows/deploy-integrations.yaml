@@ -32,4 +32,5 @@ jobs:
         env:
           PREVIOUS_TAG: ${{ steps.describe-tags.outputs.tags }}
           CURRENT_COMMIT: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python scripts/create_tags_for_changed_collections.py

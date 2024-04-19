@@ -47,7 +47,7 @@ def get_changed_integrations(
 
 def create_tags(changed_integrations: dict[str, str]) -> None:
     for integration_name, version in changed_integrations.items():
-        tag_name = f"{integration_name}_v{version}"
+        tag_name = f"{integration_name}-{version}"
         cmd = f"git tag {tag_name} && git push origin {tag_name}"
         subprocess.run(cmd, shell=True, check=True)
 
