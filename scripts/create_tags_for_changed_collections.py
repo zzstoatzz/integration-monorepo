@@ -1,3 +1,4 @@
+import asyncio
 import json
 import os
 import subprocess
@@ -5,6 +6,7 @@ import sys
 import tomllib
 from pathlib import Path
 
+from gh_util.functions import create_repo_tag
 from packaging.version import Version
 
 INTEGRATIONS_BASEPATH = "src/integrations"
@@ -45,19 +47,18 @@ def get_changed_integrations(
     return changed_integrations
 
 
-def create_tags(changed_integrations: dict[str, str]) -> None:
+async def create_tags(changed_integrations: dict[str, str]) -> None:
     for integration_name, version in changed_integrations.items():
-        tag_name = f"{integration_name}-{version}"
-        cmd = (
-            f'git config --global user.email "{os.environ["GITHUB_ACTOR"]}@users.noreply.github.com" '
-            f'&& git config --global user.name "{os.environ["GITHUB_ACTOR"]}" '
-            f'&& git tag -a {tag_name} -m "release tag {integration_name} {version}"'
-            f'&& git push origin {tag_name}'
+        await create_repo_tag(
+            owner="zzstoatzz",
+            repo="integration-monorepo",
+            tag_name=f"{integration_name}-{version}",
+            commit_sha=os.environ.get("CURRENT_COMMIT", ""),
+            message=f"Release {integration_name} {version}",
         )
-        subprocess.run(cmd, shell=True, check=True)
 
 
-def main(glob_pattern: str = "**/*.py"):
+async def main(glob_pattern: str = "**/*.py"):
     previous_tag = os.environ.get("PREVIOUS_TAG", "")
     current_commit = os.environ.get("CURRENT_COMMIT", "")
 
@@ -72,11 +73,11 @@ def main(glob_pattern: str = "**/*.py"):
     print(json.dumps(changed_integrations))
 
     if changed_integrations:
-        create_tags(changed_integrations)
+        await create_tags(changed_integrations)
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
-        main(sys.argv[1])
+        asyncio.run(main(sys.argv[1]))
     else:
-        main()
+        asyncio.run(main())
