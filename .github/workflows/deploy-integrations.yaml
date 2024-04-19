@@ -39,8 +39,7 @@ jobs:
         env:
           CHANGED_INTEGRATIONS: ${{ steps.get-changed-integrations.outputs.changed_integrations }}
         run: |
-          for integration in $(echo $CHANGED_INTEGRATIONS | tr ',' '\n'); do
-            IFS='=' read -r name version <<< "$integration"
+          echo $CHANGED_INTEGRATIONS | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while IFS='=' read -r name version; do
             tag_name="${name}_v${version}"
             git tag $tag_name
             git push origin $tag_name
